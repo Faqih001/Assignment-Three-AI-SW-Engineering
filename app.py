@@ -393,7 +393,8 @@ with log_col1:
     food_entry = st.text_input("Food item", placeholder="e.g., '1 cup oatmeal'")
     estimated_calories = st.number_input("Estimated Calories", 0, 2000, 0, step=10)
     
-    if st.button("📝 Log Food", type="primary"):
+    # Make the log button more prominent
+    if st.button("📝 Log Food", type="primary", use_container_width=True):
         if food_entry:
             # Create or load food log
             log_file = "food_log.json"
