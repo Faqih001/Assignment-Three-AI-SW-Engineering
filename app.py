@@ -266,9 +266,9 @@ user_profile = {
 }
 
 # Add button to generate AI meal plan
-col1, col2 = st.columns([3, 1])
+col1, col2, col3 = st.columns([2, 3, 2])
 with col2:
-    generate_ai_plan = st.button("🤖 Generate AI Plan", type="primary")
+    generate_ai_plan = st.button("🤖 Generate AI Meal Plan", type="primary", use_container_width=True)
 
 if generate_ai_plan:
     with st.spinner("Generating personalized meal plan..."):
@@ -301,10 +301,11 @@ with col2:
 food_search = st.text_input("Search for recipes", placeholder="e.g., 'high-protein breakfast'")
 
 if food_search:
-    col1, col2 = st.columns([3, 1])
+    # Center the AI button
+    col1, col2, col3 = st.columns([2, 3, 2])
     
     with col2:
-        use_ai_recipes = st.button("🤖 Get AI Recipes")
+        use_ai_recipes = st.button("🤖 Get AI Recipe Suggestions", type="primary", use_container_width=True)
     
     if use_ai_recipes:
         # Create recipe search prompt
@@ -455,7 +456,12 @@ with log_col2:
 # --- AI FOOD ANALYSIS ---
 if os.path.exists("food_log.json"):
     with st.expander("🤖 AI Food Analysis"):
-        if st.button("Get AI Analysis of My Food Log"):
+        # Center the AI analysis button
+        col1, col2, col3 = st.columns([2, 3, 2])
+        with col2:
+            ai_analysis_btn = st.button("🤖 Get AI Food Analysis", type="primary", use_container_width=True)
+        
+        if ai_analysis_btn:
             try:
                 with open("food_log.json", "r") as f:
                     food_log = json.load(f)
