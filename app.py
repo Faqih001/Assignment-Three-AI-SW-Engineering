@@ -3,6 +3,108 @@ import pandas as pd
 import json
 from datetime import datetime
 import os
+from azure.ai.inference import ChatCompletionsClient
+from azure.ai.inference.models import SystemMessage, UserMessage
+from azure.core.credentials import AzureKeyCredential
+
+# --- AZURE AI CONFIGURATION ---
+@st.cache_resource
+def get_azure_ai_client():
+    """Initialize Azure AI client with caching"""
+    endpoint = os.getenv("AZURE_INFERENCE_SDK_ENDPOINT", "https://mybots254.services.ai.azure.com/models")
+    model_name = os.getenv("DEPLOYMENT_NAME", "grok-3")
+    key = os.getenv("AZURE_INFERENCE_SDK_KEY", "3uTQWVskUTQFsIJbZVt2PfQFlha9afMlLhTmzgXbYY6BNq79PU69JQQJ99BEACYeBjFXJ3w3AAAAACOGMM1w")
+    
+    try:
+        client = ChatCompletionsClient(endpoint=endpoint, credential=AzureKeyCredential(key))
+        return client, model_name
+    except Exception as e:
+        st.error(f"Failed to initialize Azure AI client: {e}")
+        return None, None
+
+def get_ai_response(user_input, context_info=None):
+    """Get AI response for nutrition and fitness questions"""
+    client, model_name = get_azure_ai_client()
+    
+    if not client:
+        return "AI service is currently unavailable. Please try again later."
+    
+    try:
+        # Create system message with nutrition expertise
+        system_content = """You are an expert nutritionist and fitness coach AI assistant. 
+        You provide evidence-based, personalized nutrition and fitness advice. 
+        Always prioritize safety and recommend consulting healthcare professionals for medical conditions.
+        Keep responses concise, practical, and actionable.
+        Focus on healthy, sustainable approaches to nutrition and fitness."""
+        
+        # Add context if provided
+        if context_info:
+            system_content += f"\n\nUser Context: {context_info}"
+        
+        messages = [
+            SystemMessage(content=system_content),
+            UserMessage(content=user_input)
+        ]
+        
+        response = client.complete(
+            messages=messages,
+            model=model_name,
+            max_tokens=500,
+            temperature=0.7
+        )
+        
+        if response and response.choices:
+            return response.choices[0].message.content
+        else:
+            return "I'm having trouble generating a response right now. Please try again."
+            
+    except Exception as e:
+        return f"Sorry, I encountered an error: {str(e)}. Please try again."
+
+def generate_meal_plan_ai(user_profile):
+    """Generate personalized meal plan using AI"""
+    client, model_name = get_azure_ai_client()
+    
+    if not client:
+        return None
+    
+    try:
+        prompt = f"""Create a personalized daily meal plan for:
+        - Age: {user_profile['age']}, Gender: {user_profile['gender']}
+        - Weight: {user_profile['weight']}kg, Height: {user_profile['height']}cm
+        - Activity Level: {user_profile['activity_level']}
+        - Diet Type: {user_profile['diet_type']}
+        - Goal: {user_profile['goal']}
+        - Daily Calories: {user_profile['calories']} kcal
+        - Allergies/Restrictions: {user_profile.get('allergies', 'None')}
+        
+        Please provide:
+        1. Breakfast with estimated calories
+        2. Lunch with estimated calories
+        3. Dinner with estimated calories  
+        4. 2 Snack options with estimated calories
+        
+        Make it practical, nutritious, and aligned with their diet type and goals.
+        Format as: **Meal Name**: Description (calories kcal)"""
+        
+        response = client.complete(
+            messages=[
+                SystemMessage(content="You are a professional nutritionist creating personalized meal plans."),
+                UserMessage(content=prompt)
+            ],
+            model=model_name,
+            max_tokens=800,
+            temperature=0.8
+        )
+        
+        if response and response.choices:
+            return response.choices[0].message.content
+        else:
+            return None
+            
+    except Exception as e:
+        st.error(f"Error generating AI meal plan: {e}")
+        return None
 
 # --- SETUP ---
 st.set_page_config(page_title="Fitness Nutrition AI", layout="wide", page_icon="🍏")
@@ -140,7 +242,39 @@ meal_plans = {
     }
 }
 
-st.subheader("🥗 Suggested Meal Plan")
+st.subheader("🥗 Personalized Meal Plan")
+
+# Create user profile for AI meal planning
+user_profile = {
+    'age': age,
+    'gender': gender,
+    'weight': weight,
+    'height': height,
+    'activity_level': activity_level,
+    'diet_type': diet_type,
+    'goal': goal,
+    'calories': calories,
+    'allergies': allergies
+}
+
+# Add button to generate AI meal plan
+col1, col2 = st.columns([3, 1])
+with col2:
+    generate_ai_plan = st.button("🤖 Generate AI Plan", type="primary")
+
+if generate_ai_plan:
+    with st.spinner("Generating personalized meal plan..."):
+        ai_meal_plan = generate_meal_plan_ai(user_profile)
+        if ai_meal_plan:
+            st.session_state['ai_meal_plan'] = ai_meal_plan
+
+# Display AI-generated meal plan if available
+if 'ai_meal_plan' in st.session_state:
+    st.markdown("### 🤖 AI-Generated Meal Plan")
+    st.markdown(st.session_state['ai_meal_plan'])
+    st.markdown("---")
+
+# Fallback to default meal plans
 current_meal_plan = meal_plans.get(diet_type, meal_plans["Balanced"])
 
 for meal, desc in current_meal_plan.items():
