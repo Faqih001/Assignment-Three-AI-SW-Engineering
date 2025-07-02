@@ -14,13 +14,24 @@ load_dotenv()
 # --- AZURE AI CONFIGURATION ---
 @st.cache_resource
 def get_azure_ai_client():
-    """Initialize Azure AI client with caching"""
-    endpoint = os.getenv("AZURE_INFERENCE_SDK_ENDPOINT")
-    model_name = os.getenv("DEPLOYMENT_NAME")
-    key = os.getenv("AZURE_INFERENCE_SDK_KEY")
+    """Initialize Azure AI client with caching - supports both Streamlit secrets and env variables"""
+    try:
+        # Try to get from Streamlit secrets first (for cloud deployment)
+        if hasattr(st, 'secrets') and 'azure_ai' in st.secrets:
+            endpoint = st.secrets["azure_ai"]["AZURE_INFERENCE_SDK_ENDPOINT"]
+            model_name = st.secrets["azure_ai"]["DEPLOYMENT_NAME"]
+            key = st.secrets["azure_ai"]["AZURE_INFERENCE_SDK_KEY"]
+        else:
+            # Fallback to environment variables (for local development)
+            endpoint = os.getenv("AZURE_INFERENCE_SDK_ENDPOINT")
+            model_name = os.getenv("DEPLOYMENT_NAME")
+            key = os.getenv("AZURE_INFERENCE_SDK_KEY")
+    except Exception as e:
+        st.error(f"Error reading configuration: {e}")
+        return None, None
     
     if not endpoint or not model_name or not key:
-        st.error("Missing Azure AI configuration. Please check your .env file.")
+        st.error("Missing Azure AI configuration. Please check your secrets.toml file or .env file.")
         return None, None
     
     try:

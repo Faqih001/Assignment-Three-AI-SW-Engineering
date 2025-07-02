@@ -1,8 +1,9 @@
-# Environment variables
+# Environment variables and secrets
 .env
 .env.local
 .env.production
 .env.staging
+secrets.toml
 
 # Python
 __pycache__/
