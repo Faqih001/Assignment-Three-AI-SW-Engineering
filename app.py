@@ -293,19 +293,49 @@ with col2:
 food_search = st.text_input("Search for recipes", placeholder="e.g., 'high-protein breakfast'")
 
 if food_search:
-    st.success(f"🔎 Recipe suggestions for '{food_search}':")
+    col1, col2 = st.columns([3, 1])
     
-    # Mock recipe database - in real app, this would be from an API
-    recipes = [
-        "🥞 Protein pancakes with banana & almond butter",
-        "🥗 Quinoa chickpea power bowl",
-        "🐟 Baked salmon with herbs and lemon",
-        "🥤 Green smoothie with spinach and mango",
-        "🍳 Veggie-packed omelet with feta cheese"
-    ]
+    with col2:
+        use_ai_recipes = st.button("🤖 Get AI Recipes")
     
-    for recipe in recipes[:3]:  # Show top 3 matches
-        st.write(f"- {recipe}")
+    if use_ai_recipes:
+        # Create recipe search prompt
+        recipe_prompt = f"""Find 3 healthy recipes for: {food_search}
+        
+        User preferences:
+        - Diet type: {diet_type}
+        - Goal: {goal}
+        - Meal type: {meal_type}
+        - Cuisine: {cuisine}
+        - Allergies: {allergies if allergies else 'None'}
+        
+        For each recipe, provide:
+        1. Recipe name with emoji
+        2. Brief description
+        3. Estimated prep time
+        4. Estimated calories per serving
+        
+        Format each as: 🍽️ **Recipe Name** - Description (X minutes, ~Y calories)"""
+        
+        with st.spinner("Finding AI-powered recipes..."):
+            ai_recipes = get_ai_response(recipe_prompt)
+        
+        st.success(f"🔎 AI Recipe suggestions for '{food_search}':")
+        st.markdown(ai_recipes)
+    else:
+        st.success(f"🔎 Recipe suggestions for '{food_search}':")
+        
+        # Mock recipe database - in real app, this would be from an API
+        recipes = [
+            "🥞 Protein pancakes with banana & almond butter",
+            "🥗 Quinoa chickpea power bowl",
+            "🐟 Baked salmon with herbs and lemon",
+            "🥤 Green smoothie with spinach and mango",
+            "🍳 Veggie-packed omelet with feta cheese"
+        ]
+        
+        for recipe in recipes[:3]:  # Show top 3 matches
+            st.write(f"- {recipe}")
 
 # --- AI NUTRITION CHAT ---
 st.header("💬 AI Nutrition Coach")
