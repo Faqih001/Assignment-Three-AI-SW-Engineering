@@ -348,10 +348,43 @@ if food_search:
 
 # --- AI NUTRITION CHAT ---
 st.header("💬 AI Nutrition Coach")
-user_question = st.text_input("Ask your nutrition question", 
-                            placeholder="e.g., 'What should I eat before a workout?'")
 
-if user_question:
+# Add quick question buttons
+st.markdown("**🚀 Quick Questions:**")
+quick_questions = [
+    "What should I eat before a workout?",
+    "How much protein do I need daily?",
+    "Best foods for weight loss?",
+    "Healthy snack ideas?"
+]
+
+cols = st.columns(len(quick_questions))
+selected_question = None
+
+for i, question in enumerate(quick_questions):
+    with cols[i]:
+        if st.button(question, key=f"quick_q_{i}", help="Click to ask this question"):
+            selected_question = question
+
+# Create columns for input and button
+col1, col2 = st.columns([4, 1])
+
+with col1:
+    # Use selected question if available, otherwise allow manual input
+    if selected_question:
+        user_question = st.text_input("Ask your nutrition question", 
+                                    value=selected_question,
+                                    placeholder="e.g., 'What should I eat before a workout?'")
+    else:
+        user_question = st.text_input("Ask your nutrition question", 
+                                    placeholder="e.g., 'What should I eat before a workout?'")
+
+with col2:
+    st.write("")  # Add some space to align with the input
+    ask_ai = st.button("🤖 Ask AI", type="primary", use_container_width=True)
+
+# Process the question when either the button is clicked or there's text input
+if user_question and (ask_ai or selected_question):
     # Create context for better AI responses
     user_context = f"User Profile: {age}yo {gender}, {weight}kg, {height}cm, {activity_level} activity, {diet_type} diet, Goal: {goal}"
     
