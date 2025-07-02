@@ -13,6 +13,7 @@ This guide will help you deploy your Fitness Nutrition AI Assistant to Streamlit
 ### 1. Prepare Your Repository
 
 Make sure your repository has these files:
+
 - `app.py` (main application)
 - `requirements.txt` (dependencies)
 - `secrets.toml.example` (template for secrets)
@@ -37,12 +38,12 @@ git push origin main
 
 3. **Create New App**: Click "New app" button
 
-4. **Connect Repository**: 
+4. **Connect Repository**:
    - Select your GitHub repository
    - Choose the branch (usually `main`)
    - Set main file path: `app.py`
 
-5. **Configure Secrets**: 
+5. **Configure Secrets**:
    - Click on "Advanced settings"
    - Go to the "Secrets" section
    - Copy the content from your local `secrets.toml` file
@@ -82,6 +83,7 @@ Your app automatically detects the deployment environment:
 ### Environment Detection
 
 The app uses this logic:
+
 ```python
 # Try Streamlit secrets first (cloud deployment)
 if hasattr(st, 'secrets') and 'azure_ai' in st.secrets:
@@ -98,6 +100,7 @@ else:
 ## 🔒 Security Best Practices
 
 ### ✅ Do's
+
 - Use Streamlit Cloud's built-in secrets management
 - Keep your API keys secure and rotate them regularly
 - Test your app locally before deploying
@@ -105,6 +108,7 @@ else:
 - Set appropriate permissions on your GitHub repository
 
 ### ❌ Don'ts
+
 - Never commit `secrets.toml` or `.env` files to your repository
 - Don't hardcode API keys in your source code
 - Don't share your secrets in plain text
@@ -148,6 +152,7 @@ To update your deployed app:
 ## 📊 Monitoring
 
 After deployment, you can:
+
 - View app analytics in Streamlit Cloud dashboard
 - Monitor usage and performance
 - Check error logs and debugging information
@@ -162,9 +167,10 @@ If you encounter issues:
 3. **GitHub Issues**: Create an issue in your repository
 4. **Azure AI Support**: [Azure Support Portal](https://portal.azure.com)
 
-## 🎉 Success!
+## 🎉 Success
 
 Once deployed successfully, your Fitness Nutrition AI Assistant will be:
+
 - ✅ Accessible via public URL
 - ✅ Using secure cloud-based secrets
 - ✅ Automatically updating when you push changes
