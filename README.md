@@ -81,13 +81,27 @@ The app will open in your browser at `http://localhost:8501`
 
 ## Deployment Options
 
-### Streamlit Community Cloud
+### Streamlit Community Cloud (Recommended)
 
-1. Push your code to GitHub (without the `.env` file)
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your repository
-4. Add your environment variables in the Streamlit Cloud settings
-5. Deploy with one click
+1. **Push your code to GitHub** (without the `.env` or `secrets.toml` files)
+2. **Go to** [share.streamlit.io](https://share.streamlit.io)
+3. **Connect your repository**
+4. **Add your environment variables** in the Streamlit Cloud secrets section using TOML format:
+
+```toml
+[azure_ai]
+AZURE_INFERENCE_SDK_ENDPOINT = "https://yourservice.services.ai.azure.com/models"
+DEPLOYMENT_NAME = "your-model-deployment-name"
+AZURE_INFERENCE_SDK_KEY = "your-azure-ai-key-here"
+
+[app_config]
+APP_NAME = "Fitness Nutrition AI Assistant"
+DEBUG = false
+```
+
+5. **Deploy with one click**
+
+📖 **Detailed deployment guide**: See [DEPLOYMENT.md](DEPLOYMENT.md) for complete step-by-step instructions.
 
 ### Local Development
 
