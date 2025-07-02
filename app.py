@@ -308,29 +308,40 @@ if food_search:
         st.write(f"- {recipe}")
 
 # --- AI NUTRITION CHAT ---
-st.header("💬 Nutrition Q&A")
-user_question = st.text_input("Ask a nutrition question", 
+st.header("💬 AI Nutrition Coach")
+user_question = st.text_input("Ask your nutrition question", 
                             placeholder="e.g., 'What should I eat before a workout?'")
 
 if user_question:
-    # Enhanced responses based on common questions
-    responses = {
-        "pre-workout": "Eat a balanced snack 1-2 hours before working out. Good options: banana with peanut butter, oatmeal with berries, or Greek yogurt with granola.",
-        "post-workout": "Within 30 minutes after workout, have protein and carbs. Try: chocolate milk, protein shake with banana, or chicken with rice.",
-        "weight loss": "Focus on a caloric deficit while maintaining protein intake. Eat plenty of vegetables, lean proteins, and whole grains.",
-        "muscle gain": "Eat in a slight caloric surplus with adequate protein (0.8-1g per lb body weight). Include resistance training.",
-        "hydration": f"Aim for {water_intake:.0f}ml of water daily, more if you're active. Monitor urine color - pale yellow is ideal."
-    }
+    # Create context for better AI responses
+    user_context = f"User Profile: {age}yo {gender}, {weight}kg, {height}cm, {activity_level} activity, {diet_type} diet, Goal: {goal}"
     
-    # Simple keyword matching for demo
-    response_key = next((key for key in responses.keys() if key in user_question.lower()), None)
+    if allergies:
+        user_context += f", Allergies: {allergies}"
+    if medical_conditions:
+        user_context += f", Medical conditions: {medical_conditions}"
     
-    if response_key:
-        response = responses[response_key]
-    else:
-        response = "That's a great question! For personalized nutrition advice, consider consulting with a registered dietitian."
+    with st.spinner("Getting AI response..."):
+        ai_response = get_ai_response(user_question, user_context)
     
-    st.info(f"**🤖 AI Nutritionist:** {response}")
+    st.info(f"**🤖 AI Nutrition Coach:** {ai_response}")
+    
+    # Add follow-up suggestions
+    st.markdown("**💡 Related Topics:**")
+    follow_up_topics = [
+        "Meal timing and frequency",
+        "Hydration recommendations", 
+        "Supplement guidance",
+        "Exercise nutrition",
+        "Recipe suggestions"
+    ]
+    
+    cols = st.columns(len(follow_up_topics))
+    for i, topic in enumerate(follow_up_topics):
+        with cols[i]:
+            if st.button(topic, key=f"topic_{i}"):
+                follow_up_response = get_ai_response(f"Give advice about {topic.lower()}", user_context)
+                st.info(f"**🤖 AI Coach:** {follow_up_response}")
 
 # --- FOOD LOG TRACKER ---
 st.header("📝 Food Diary")
