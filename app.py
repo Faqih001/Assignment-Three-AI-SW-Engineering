@@ -3,9 +3,13 @@ import pandas as pd
 import json
 from datetime import datetime
 import os
+from dotenv import load_dotenv
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
+
+# Load environment variables from .env file
+load_dotenv()
 
 # --- AZURE AI CONFIGURATION ---
 @st.cache_resource
@@ -443,6 +447,46 @@ with log_col2:
             st.error(f"Error loading food log: {e}")
     else:
         st.info("Start logging food to see your daily summary!")
+
+# --- AI FOOD ANALYSIS ---
+if os.path.exists("food_log.json"):
+    with st.expander("🤖 AI Food Analysis"):
+        if st.button("Get AI Analysis of My Food Log"):
+            try:
+                with open("food_log.json", "r") as f:
+                    food_log = json.load(f)
+                
+                # Get recent entries (last 7 days)
+                recent_entries = []
+                for entry in food_log[-20:]:  # Last 20 entries
+                    recent_entries.append(f"{entry['food']} ({entry['calories']} kcal)")
+                
+                if recent_entries:
+                    analysis_prompt = f"""Analyze this food log and provide nutrition insights:
+                    
+                    Recent foods logged: {', '.join(recent_entries)}
+                    
+                    User profile: {age}yo {gender}, {weight}kg, Goal: {goal}, Diet: {diet_type}
+                    Daily calorie target: {int(calories)} kcal
+                    
+                    Please provide:
+                    1. Overall nutrition assessment
+                    2. Suggestions for improvement
+                    3. Missing nutrients or food groups
+                    4. Alignment with their goals
+                    
+                    Keep it constructive and encouraging."""
+                    
+                    with st.spinner("Analyzing your food log..."):
+                        analysis = get_ai_response(analysis_prompt)
+                    
+                    st.markdown("### 📊 Your Personalized Food Analysis")
+                    st.info(analysis)
+                else:
+                    st.info("Log more food entries to get AI analysis!")
+                    
+            except Exception as e:
+                st.error(f"Error analyzing food log: {e}")
 
 # --- FOOTER ---
 st.markdown("---")

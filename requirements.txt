@@ -2,3 +2,4 @@ streamlit>=1.28.0
 pandas>=1.5.0
 azure-identity>=1.15.0
 azure-ai-inference>=1.0.0
+python-dotenv>=1.0.0
