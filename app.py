@@ -296,7 +296,7 @@ with col1:
     meal_type = st.selectbox("Meal Type", ["Breakfast", "Lunch", "Dinner", "Snack", "Any"])
 
 with col2:
-    cuisine = st.selectbox("Cuisine", ["Any", "Mediterranean", "Asian", "American", "Mexican", "Italian"])
+    cuisine = st.selectbox("Cuisine", ["Any", "Mediterranean", "Asian", "American", "Mexican", "Italian", "African"])
 
 food_search = st.text_input("Search for recipes", placeholder="e.g., 'high-protein breakfast'")
 
