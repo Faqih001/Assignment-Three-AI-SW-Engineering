@@ -15,9 +15,13 @@ load_dotenv()
 @st.cache_resource
 def get_azure_ai_client():
     """Initialize Azure AI client with caching"""
-    endpoint = os.getenv("AZURE_INFERENCE_SDK_ENDPOINT", "https://mybots254.services.ai.azure.com/models")
-    model_name = os.getenv("DEPLOYMENT_NAME", "grok-3")
-    key = os.getenv("AZURE_INFERENCE_SDK_KEY", "3uTQWVskUTQFsIJbZVt2PfQFlha9afMlLhTmzgXbYY6BNq79PU69JQQJ99BEACYeBjFXJ3w3AAAAACOGMM1w")
+    endpoint = os.getenv("AZURE_INFERENCE_SDK_ENDPOINT")
+    model_name = os.getenv("DEPLOYMENT_NAME")
+    key = os.getenv("AZURE_INFERENCE_SDK_KEY")
+    
+    if not endpoint or not model_name or not key:
+        st.error("Missing Azure AI configuration. Please check your .env file.")
+        return None, None
     
     try:
         client = ChatCompletionsClient(endpoint=endpoint, credential=AzureKeyCredential(key))
